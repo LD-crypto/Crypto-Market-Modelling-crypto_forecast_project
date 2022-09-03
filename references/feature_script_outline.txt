@@ -1,0 +1,99 @@
+feature_script
+=============================
+
+The feature script takes the sampled market trade data and then derives the mass market features and then makes the mass features stationary using fractional differentiation.
+
+If there are time gaps in the data then the data must be split into individual dataframes prior to the running of the feature_script.
+
+Script run procedure:
+---------------
+
+input: [--folder FOLDER]
+## Folder should be split into sub folders for each different market
+## Different markets in each folder split if there are gaps
+
+For each --market in --folder:
+	
+	get mass features for --market_split
+	
+	make features stationary:
+
+		fracDiff each --market_split for {set of d}
+		join --market_split into --market_full
+		test each --fracDiff_feature of --market_full for stationarity
+		select lowest --d for each --fracDiff_feature where stationary==True
+		fracDiff each --feature of each --market_split with --d
+		return --stationary_market_split
+
+	join and save --stationary_market_full
+
+
+----------------
+----------------
+
+data folder structure:
+
+interim
+--[method]_sampled
+	-- sampled
+		-- market1
+			-- split_data1.pkl
+			-- split_data2.pkl...
+		-- ...
+	-- features
+  		-- markets...
+			-- split_data1_features.pkl
+			-- split_data1_dvalues.pkl (p-value of each d for each feature)
+
+processed
+--[method]_sampled
+	-- market1_sampled_fracDiff_data.pkl
+	-- market2...
+
+
+The final output is a folder with a file for each market. The file is a data set of stationary features that describe the market data. These files are saved to the processed folder. The raw un-fracDiff features and the p-value of for each d tested is saved in the interim folder 'interim\[method]_sampled\features'.
+
+These datasets and features are then ready to be used for analysis or for use in machine learning models.
+
+-----------------
+psuedo-code
+-----------------
+
+script location:
+project > src > features
+
+data location:
+project > data > interim > [sampled_method] > raw > markets > data_files
+
+-----------------
+
+def main( [sampled_method] ):
+
+	if project > data > interim > sampled_method > raw doesn't_exist:
+		error
+
+	for each >market in >sampled_method >raw:
+
+		# CREATE+SAVE MASS FEATURES
+		if (>sampled_method >features) doesn't exist:
+			create(>sampled_method >features)
+		create(>sampled_method >features >market)
+		for each >data_file in >market:
+			[df,] = getMassFeatures()
+		save([df,]) in (>sampled_method >features >market)
+
+		# FRACDIFF+TEST+SAVE D_VALUES
+		for each {d}:
+			for each df in [df,]:
+				fdf = fracDiff(df,d)
+			DF = join([fdf,])
+			d_values[d] = testStationarity(DF)
+		save(d_values) in (>sampled_method >features >markets)
+
+		# CREATE+SAVE FINAL STATIONARY SET
+		stationary_DF = makeStationary([df,],d_values)
+		if (>data >processed >sampled_method >markets) doesn't exist:
+			create (>data >processed >sampled_method >markets)
+		save(stationary_DF) in (>data >processed >sampled_method >markets)
+
+------------------

@@ -1,0 +1,43 @@
+feature_dictionary
+================================
+
+The scripts in the features folder output a mass set of dervied market features from sampled trade data. The features of the sampled data and the mass derived features are described in this document. The derived features are so-called because they are all a function of the time-series of the raw sampled features.
+
+
+----------------
+
+#########
+raw sampled features:
+
+date:		timestamp of when the sample was taken
+open:		first price over the sample period ('o')
+high:		highest price over the sample ('h')
+low:		lowest price over the sample ('l')
+close:		last price over the sample ('c',' ')
+wavg:		weighted average of the price
+volume:		sum of the amount of the assets traded over sample
+value:		sum of the value traded over the sample [value = price*volume]
+
+##########
+derived features:
+
+ret:		single period return of closing price
+log_:		the natural log of ___
+oh,ol,...: 	the difference of the log_ feature where {o = open, h = high, l = low, c = close}
+logret:		single period difference of logclose, ie. log_return
+X_1d__:		X period difference of log___, approximate first differential
+X_2d__:		X period difference of the approx. first differential, approximate second differential
+sma_X:		simple moving average of feature __ where {nan = close, h = high, l = low} computed over rolling window size X
+stdX:		standard deviation of logret over window size X
+tr:		true range, a function of open, high, low, close.
+atrX:		average true range over window size X
+dvol_:		daily volatility of price __
+cciX:		commodity channel index computed over X periods
+rsiX:		relative strength index computed over X periods
+wrX:		williams %R computed over X periods
+dma_X-Y:	difference between the smaX and smaY of __ price
+lasthighX:	difference between logclose and highest loghigh price over X periods
+lastlowX:	difference between logcloser and lowest loglow over X periods
+
+
+---------------------

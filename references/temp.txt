@@ -1,0 +1,27 @@
+Feature Analysis:
+Bag Ensemble random forest classifier from sickitlearn:
+clf=RandomForestClassi?er(n_estimators=1, criterion='entropy', bootstrap=False, class_weight='balanced_ subsample')
+bc=BaggingClassi?er(base_estimator=clf, n_estimators=1000,max_samples=avgU, max_features=1.)
+
+Bag Ensemble decision tree classifier:
+clf=DecisionTreeClassi?er(criterion='entropy',max_ features='auto',class_weight='balanced')
+bc=BaggingClassi?er(base_estimator=clf,n_estimators= 1000,max_samples=avgU,max_features=1.)
+
+Fit bagged tree model on the PCA of the features. May increase the speed of computations.
+
+Purged CrossValidation:
+To stop leakage from train to test set on correlated X,Y -> t,t+1
+
+def getTrainTimes(t1,testTimes): 
+'''
+Given testTimes, find the times of the training observations. 
+—t1.index: Time when the observation started. 
+—t1.value: Time when the observation ended. 
+—testTimes: Times of testing observations. 
+''' 
+trn=t1.copy(deep=True) 
+for i,j in testTimes.iteritems(): 
+	df0=trn[(i<=trn.index)&(trn.index<=j)].index # train starts within test 
+	df1=trn[(i<=trn)&(trn<=j)].index # train ends within test 
+	df2=trn[(trn.index<=i)&(j<=trn)].index # train envelops test 
+trn=trn.drop(df0.union(df1).union(df2)) return trn

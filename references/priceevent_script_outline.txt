@@ -1,0 +1,22 @@
+priceevent_weight_label_script.py
+outline
+
+- for each market:
+# sample after an event and get the labels
+- - getTEvents( event_criteria )
+- - getVertT1( holding_period h )
+- - out <- getEvents( targets t )
+# calculate weights for the samples
+- - getNumCoEvents()
+- - out.tW <- mpSampleTW() #uniqueness used in boostrapping
+- - out.W <- mpSampleW()
+- - normalize : out['W']*=out.shape[0]/out['W'].sum()
+# add d% time decay per year
+- - 
+td=data.index[-1]-data.index[0]
+num_years=td.days/365
+decay_param = d/100*num_years
+- - dw <- getTimeDecay()
+- - out['dW'] = out['W']*dW
+# save the output weights and labels
+- - save dataframe in folder related to (event_crit, h, t, d)
